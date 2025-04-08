@@ -124,11 +124,11 @@
 <body>
 
 <div id="container">
-  <h2> EDUINO AI</h2>
+  <h2>🧠 EDUINO AI</h2>
   <input type="text" id="model-link" placeholder="Paste Teachable Machine Link">
   <br>
-  <button id="connect-btn" onclick="connectBluetooth()"> Connect Bluetooth</button>
-  <button id="start-btn" onclick="startAI()">Start AI Mode</button>
+  <button id="connect-btn" onclick="connectBluetooth()">🔗 Connect Bluetooth</button>
+  <button id="start-btn" onclick="startAI()">🤖 Start AI Mode</button>
   <div id="status">Status: Not Connected</div>
   <div id="webcam-container"></div>
   <div id="label-container"></div>
@@ -150,11 +150,11 @@ async function connectBluetooth() {
     bluetoothServer = await bluetoothDevice.gatt.connect();
     const service = await bluetoothServer.getPrimaryService(0xFFE0);
     bluetoothCharacteristic = await service.getCharacteristic(0xFFE1);
-    document.getElementById("status").innerText = "Status: Bluetooth Connected";
+    document.getElementById("status").innerText = "Status: ✅ Bluetooth Connected";
     document.getElementById("status").style.color = "#44bd32";
   } catch (err) {
     alert("Bluetooth Error: " + err);
-    document.getElementById("status").innerText = "Status: Bluetooth Failed";
+    document.getElementById("status").innerText = "Status: ❌ Bluetooth Failed";
     document.getElementById("status").style.color = "#e84118";
   }
 }
@@ -168,7 +168,7 @@ async function startAI() {
   try {
     model = await tmImage.load(modelURL, metadataURL);
     maxPredictions = model.getTotalClasses();
-    document.getElementById("status").innerText = "Status: Model Loaded";
+    document.getElementById("status").innerText = "Status: ✅ Model Loaded";
     document.getElementById("status").style.color = "#44bd32";
 
     const flip = true;
@@ -203,8 +203,8 @@ async function startAI() {
       labelContainer.appendChild(wrapper);
     }
   } catch (e) {
-    alert(" Failed to load model. Check the link.");
-    document.getElementById("status").innerText = "Status: Model Load Failed";
+    alert("❌ Failed to load model. Check the link.");
+    document.getElementById("status").innerText = "Status: ❌ Model Load Failed";
     document.getElementById("status").style.color = "#e84118";
   }
 }
