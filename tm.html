@@ -20,7 +20,7 @@
 
     #container {
       max-width: 700px;
-      margin: auto;
+      margin: auto; 
       background: white;
       padding: 30px;
       box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
@@ -84,20 +84,32 @@
     }
 
     .progress-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       margin: 10px 0;
+      padding: 5px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background-color: #f9f9f9;
     }
 
     .label-text {
-      margin-bottom: 6px;
-      font-weight: 500;
+      flex: 1;
+      font-weight: bold;
+      font-size: 14px;
+      color: #2f3640;
+      text-align: left;
+      margin-right: 10px;
     }
 
     .progress-bar {
-      width: 100%;
+      flex: 2;
       height: 20px;
       background-color: #ddd;
       border-radius: 10px;
       overflow: hidden;
+      margin-right: 10px;
     }
 
     .progress-fill {
@@ -119,12 +131,99 @@
     .color-8 { background-color: #fab1a0; }
     .color-9 { background-color: #55efc4; }
 
+    /* Styles for Telegram inputs and button */
+    #telegram-inputs {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    #telegram-inputs input[type="text"] {
+      display: block;
+      margin: 10px auto;
+      padding: 10px;
+      font-size: 16px;
+      width: 80%;
+      max-width: 400px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    #submit-telegram-btn {
+      background-color: #e1b12c;
+      color: white;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    #toggle-telegram-btn{
+      background-color: #e1b12c;
+      color: white;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    #submit-telegram-btn:hover {
+      background-color: #d89b1c;
+    }
+
+    /* Toggle Switch Styles */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: 0.4s;
+      border-radius: 24px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: #4cd137;
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
   </style>
 </head>
 <body>
 
 <div id="container">
-  <h2>🧠 EDUINO AI</h2>
+  <h2>🧠 WELCOME TO EDUINO AI</h2>
   <input type="text" id="model-link" placeholder="Paste Teachable Machine Link">
   <br>
   <button id="connect-btn" onclick="connectBluetooth()">🔗 Connect Bluetooth</button>
@@ -132,6 +231,16 @@
   <div id="status">Status: Not Connected</div>
   <div id="webcam-container"></div>
   <div id="label-container"></div>
+
+  <!-- Button to toggle Telegram inputs -->
+  <button id="toggle-telegram-btn" onclick="toggleTelegramInputs()">📩 Set Telegram Details</button>
+
+  <!-- Hidden inputs and submit button for Telegram -->
+  <div id="telegram-inputs" style="display: none;">
+    <input type="text" id="bot-token" placeholder="Enter Telegram Bot Token">
+    <input type="text" id="chat-id" placeholder="Enter Telegram Chat ID">
+    <button id="submit-telegram-btn" onclick="submitTelegramDetails()">Submit</button>
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
@@ -140,6 +249,8 @@
 let model, webcam, labelContainer, maxPredictions;
 let bluetoothDevice, bluetoothServer, bluetoothCharacteristic;
 let lastSent = "";
+let telegramBotToken = "";
+let telegramChatId = "";
 
 async function connectBluetooth() {
   try {
@@ -185,21 +296,61 @@ async function startAI() {
     for (let i = 0; i < maxPredictions; i++) {
       const wrapper = document.createElement("div");
       wrapper.className = "progress-wrapper";
+      wrapper.style.display = "flex";
+      wrapper.style.alignItems = "center";
+      wrapper.style.marginBottom = "10px";
 
       const label = document.createElement("div");
       label.className = "label-text";
       label.id = "label-" + i;
+      label.style.flex = "1";
 
       const progressBar = document.createElement("div");
       progressBar.className = "progress-bar";
+      progressBar.style.flex = "2";
 
       const fill = document.createElement("div");
       fill.className = "progress-fill color-" + i;
       fill.id = "fill-" + i;
 
+      const input = document.createElement("input");
+      input.type = "text";
+      input.id = "input-" + i;
+      input.placeholder = "Enter Message";
+      input.style.marginLeft = "10px";
+      input.style.padding = "5px";
+      input.style.marginTop = "10px";
+      input.style.fontSize = "14px";
+      input.style.borderRadius = "5px";
+      input.style.border = "1px solid #ccc";
+      input.style.flex = "1";
+
+      // Add a switch (checkbox) for enabling/disabling Telegram messages
+      const switchWrapper = document.createElement("div");
+      switchWrapper.style.display = "flex";
+      switchWrapper.style.alignItems = "center";
+      switchWrapper.style.marginLeft = "10px";
+
+      const switchLabel = document.createElement("label");
+       switchLabel.className = "switch";
+
+      const switchInput = document.createElement("input");
+      switchInput.type = "checkbox";
+      switchInput.id = "switch-" + i;
+      switchInput.checked = true; // Default to enabled
+
+      const slider = document.createElement("span");
+      slider.className = "slider";
+
+      switchLabel.appendChild(switchInput);
+      switchLabel.appendChild(slider);
+      switchWrapper.appendChild(switchLabel);
+
       progressBar.appendChild(fill);
       wrapper.appendChild(label);
-      wrapper.appendChild(progressBar);
+      wrapper.appendChild(progressBar); // Add progress bar before the input box
+      wrapper.appendChild(input); // Add input box
+      wrapper.appendChild(switchWrapper); // Add the switch
       labelContainer.appendChild(wrapper);
     }
   } catch (e) {
@@ -224,18 +375,33 @@ async function predict() {
     const prob = prediction[i].probability;
     const className = prediction[i].className;
 
-document.getElementById("label-" + i).innerText =` ${className}: ${(prob * 100).toFixed(1)}%`;
+    document.getElementById("label-" + i).innerText = ` ${className}: ${(prob * 100).toFixed(1)}%`;
     document.getElementById("fill-" + i).style.width = (prob * 100) + "%";
 
     if (prob > highestProb) {
       highestProb = prob;
       bestClass = className;
     }
-  }
 
-  if (highestProb > 0.90 && bestClass !== lastSent) {
-    sendBluetoothCommand(bestClass);
-    lastSent = bestClass;
+    if (prob > 0.90 && bestClass !== lastSent) {
+      const message = document.getElementById("input-" + i).value.trim(); // Get the message from the input box
+      const isSwitchOn = document.getElementById("switch-" + i).checked; // Check if the switch is enabled
+
+      if (isSwitchOn) {
+        // Capture the current frame from the webcam
+        const canvas = webcam.canvas;
+        canvas.toBlob((blob) => {
+          sendTelegramMessage(message, blob, isSwitchOn); // Send the message and image to Telegram
+        }, "image/jpeg");
+      } else {
+        sendTelegramMessage(message, null, isSwitchOn); // Send only the message
+      }
+
+      lastSent = bestClass; // Update the last sent class
+    } else if (prob < 0.90 && lastSent === className) {
+      // Reset lastSent if the probability drops below 90%
+      lastSent = "";
+    }
   }
 }
 
@@ -245,6 +411,80 @@ function sendBluetoothCommand(cmd) {
     bluetoothCharacteristic.writeValue(encoder.encode(cmd + "\n"));
     console.log("Sent via Bluetooth:", cmd);
   }
+}
+
+function toggleTelegramInputs() {
+  const telegramInputs = document.getElementById("telegram-inputs");
+  const toggleButton = document.getElementById("toggle-telegram-btn");
+
+  if (telegramInputs.style.display === "none") {
+    telegramInputs.style.display = "block";
+    toggleButton.innerText = "Cancel";
+  } else {
+    telegramInputs.style.display = "none";
+    toggleButton.innerText = "📩 Set Telegram Details";
+  }
+}
+
+function submitTelegramDetails() {
+  telegramBotToken = document.getElementById("bot-token").value.trim();
+  telegramChatId = document.getElementById("chat-id").value.trim();
+
+  if (telegramBotToken && telegramChatId) {
+    alert("Telegram details set successfully!");
+    console.log("Bot Token:", telegramBotToken);
+    console.log("Chat ID:", telegramChatId);
+  } else {
+    alert("Please enter both Bot Token and Chat ID.");
+  }
+
+  // Hide the inputs and reset the toggle button
+  document.getElementById("telegram-inputs").style.display = "none";
+  document.getElementById("toggle-telegram-btn").innerText = "📩 Set Telegram Details";
+}
+
+function sendTelegramMessage(message, imageData, isSwitchOn) {
+  // Check if Telegram details are set
+  if (!telegramBotToken || !telegramChatId) {
+    console.warn("Telegram details are not set. Skipping message.");
+    return; // Exit the function if Telegram details are missing
+  }
+
+  // Determine the API endpoint based on the switch state
+  const url = isSwitchOn
+    ? `https://api.telegram.org/bot${telegramBotToken}/sendPhoto`
+    : `https://api.telegram.org/bot${telegramBotToken}/sendMessage`;
+
+  const formData = new FormData();
+  formData.append("chat_id", telegramChatId);
+
+  if (isSwitchOn && imageData) {
+    // If the switch is on, send a photo
+    formData.append("caption", message);
+    formData.append("photo", imageData);
+  } else {
+    // If the switch is off, send a text message
+    formData.append("text", message);
+  }
+
+  fetch(url, {
+    method: "POST",
+    body: formData,
+  })
+    .then((response) => {
+      if (!response.ok) {
+        console.error("Failed to send Telegram message:", response.statusText);
+      } else {
+        console.log(
+          `Message sent to Telegram: "${message}"${
+            isSwitchOn ? " with image" : ""
+          }`
+        );
+      }
+    })
+    .catch((error) => {
+      console.error("Error sending Telegram message:", error);
+    });
 }
 </script>
 
