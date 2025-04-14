@@ -181,6 +181,29 @@
     input:checked + .slider { background-color: #27ae60; }
     input:checked + .slider:before { transform: translateX(22px); }
 
+    .floating-add-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #27ae60;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      font-size: 30px;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.3s;
+    }
+
+    .floating-add-btn:hover {
+      background: #2ecc71;
+    }
+
     @media (max-width: 768px) {
       body { flex-direction: column; }
       .sidebar { width: 100%; height: auto; }
@@ -231,9 +254,13 @@
     </div>
   </div>
 
+  <!-- Floating Add Button -->
+  <button class="floating-add-btn" onclick="addSlideSwitch()">+</button>
+
   <script>
     let bluetoothDevice;
     let writeCharacteristic;
+    let slideCount = 0;
 
     async function connectBluetooth() {
       try {
@@ -268,6 +295,30 @@
       sendCommand(cmd);
     }
 
+    function addSlideSwitch() {
+      slideCount++;
+      const slideInputsDiv = document.getElementById("slideInputs");
+      const switchGrid = document.getElementById("switchGrid");
+
+      // Add inputs to the sidebar
+      slideInputsDiv.innerHTML += `
+        <label>Slide ${slideCount} ON</label><input id="slideOn${slideCount}" value="ON${slideCount}">
+        <label>Slide ${slideCount} OFF</label><input id="slideOff${slideCount}" value="OFF${slideCount}">
+      `;
+
+      // Add switch to the main grid
+      const div = document.createElement("div");
+      div.className = "switch-label";
+      div.innerHTML = `
+        <span>Slide ${slideCount}</span>
+        <label class="switch">
+          <input type="checkbox" onchange="handleSlide(${slideCount}, this.checked)">
+          <span class="slider"></span>
+        </label>
+      `;
+      switchGrid.appendChild(div);
+    }
+
     function handleSlide(index, checked) {
       const onCmd = document.getElementById(`slideOn${index}`).value;
       const offCmd = document.getElementById(`slideOff${index}`).value;
@@ -277,62 +328,6 @@
     function toggleSidebar() {
       document.getElementById("sidebar").classList.toggle("hidden");
       document.getElementById("container").classList.toggle("shifted");
-    }
-
-    const slideInputsDiv = document.getElementById("slideInputs");
-    const switchGrid = document.getElementById("switchGrid");
-    for (let i = 1; i <= 12; i++) {
-      slideInputsDiv.innerHTML += `
-        <label>Slide ${i} ON</label><input id="slideOn${i}" value="ON${i}">
-        <label>Slide ${i} OFF</label><input id="slideOff${i}" value="OFF${i}">
-      `;
-      const div = document.createElement("div");
-      div.className = "switch-label";
-      div.innerHTML = `
-        <span>Slide ${i}</span>
-        <label class="switch">
-          <input type="checkbox" onchange="handleSlide(${i}, this.checked)">
-          <span class="slider"></span>
-        </label>
-      `;
-      switchGrid.appendChild(div);
-    }
-
-    function startVoiceRecognition() {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechRecognition) return alert("Speech Recognition not supported!");
-
-      const recognition = new SpeechRecognition();
-      recognition.lang = 'en-US';
-      recognition.interimResults = false;
-      recognition.maxAlternatives = 1;
-
-      recognition.onresult = function(event) {
-        const transcript = event.results[0][0].transcript.toLowerCase();
-        console.log("🎙️ Voice:", transcript);
-        processVoiceCommand(transcript);
-      };
-
-      recognition.onerror = function(event) {
-        alert("Voice error: " + event.error);
-      };
-
-      recognition.start();
-    }
-
-    function processVoiceCommand(cmd) {
-      if (cmd.includes("forward")) sendCustomCommand("F");
-      else if (cmd.includes("backward")) sendCustomCommand("B");
-      else if (cmd.includes("left")) sendCustomCommand("L");
-      else if (cmd.includes("right")) sendCustomCommand("R");
-      else if (cmd.includes("stop")) sendCustomCommand("S");
-      else {
-        const matchOn = cmd.match(/slide (\d+) on/);
-        const matchOff = cmd.match(/slide (\d+) off/);
-        if (matchOn) handleSlide(matchOn[1], true);
-        else if (matchOff) handleSlide(matchOff[1], false);
-        else alert("❓ Unknown voice command: " + cmd);
-      }
     }
   </script>
 </body>
