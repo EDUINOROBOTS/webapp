@@ -60,6 +60,10 @@
       background-color: #4cd137;
       color: white;
     }
+    #training-btn {
+      background-color: #cc37d1;
+      color: white;
+    }
 
     #status {
       margin-top: 15px;
@@ -228,6 +232,7 @@
   <br>
   <button id="connect-btn" onclick="connectBluetooth()">🔗 Connect Bluetooth</button>
   <button id="start-btn" onclick="startAI()">🤖 Start AI Mode</button>
+  <button id="training-btn" onclick="starttraining()">👩🏻‍💻 TRAIN MODEL</button>
   <div id="status">Status: Not Connected</div>
   <div id="webcam-container"></div>
   <div id="label-container"></div>
@@ -269,7 +274,9 @@ async function connectBluetooth() {
     document.getElementById("status").style.color = "#e84118";
   }
 }
-
+function starttraining() {
+  window.open("https://teachablemachine.withgoogle.com/", "_blank");
+}
 async function startAI() {
   let link = document.getElementById("model-link").value.trim();
   if (!link.endsWith("/")) link += "/";
