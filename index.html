@@ -1,334 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>EDUINO AI CONTROL</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WEB CONTROLLER</title>
   <style>
-    * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
     body {
       margin: 0;
       padding: 0;
-      display: flex;
       height: 100vh;
-      overflow: hidden;
-      background: linear-gradient(135deg, #e3f2fd, #f3e5f5);
-    }
-
-    .sidebar {
-      width: 280px;
-      background: #2c3e50;
-      color: white;
       display: flex;
       flex-direction: column;
-      padding: 20px;
-      gap: 10px;
-      overflow-y: auto;
-      transition: transform 0.3s ease;
-    }
-
-    .sidebar.hidden {
-      transform: translateX(-100%);
-    }
-
-    .sidebar h2 { margin: 0; font-size: 20px; text-align: center; color: white; }
-    .sidebar label { display: block; margin-top: 10px; font-size: 14px; color: white; }
-    .sidebar input {
-      width: 100%;
-      padding: 6px;
-      margin-top: 3px;
-      border: none;
-      border-radius: 6px;
-    }
-
-    .container {
-      flex: 1;
-      display: flex;
-      flex-direction: row;
-      transition: margin-left 0.3s ease;
-    }
-
-    .container.shifted { margin-left: -280px; }
-
-    .left-panel, .right-panel {
-      flex: 1;
-      padding: 30px;
-      display: flex;
-      flex-direction: column;
-      overflow-y: auto;
-    }
-
-    .left-panel {
-      background: #ecf0f1;
-      border-right: 2px solid #dcdde1;
+      justify-content: center;
       align-items: center;
-      justify-content: center;
+      background: linear-gradient(135deg, #74ebd5, #acb6e5);
+      font-family: 'Poppins', sans-serif;
     }
 
-    .right-panel { background: #ffffff; }
-
-    .toggle-menu {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      z-index: 1000;
-      background: #34495e;
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    h2 { color: #34495e; margin-bottom: 20px; }
-
-    .direction-pad {
-      display: grid;
-      grid-template-columns: 80px 80px 80px;
-      grid-template-rows: 80px 80px 80px;
-      gap: 15px;
-      justify-content: center;
+    h1 {
+      color: #080808;
       margin-bottom: 40px;
+      font-size: 2rem;
     }
 
-    .direction-pad button {
-      font-size: 18px;
-      background: #3498db;
-      color: white;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: 0.3s;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-
-    .direction-pad button:hover { background: #2980b9; }
-
-    .connect-btn {
+    .buttons {
       display: flex;
-      gap: 15px;
-      flex-wrap: wrap;
-      justify-content: center;
-      margin-top: 20px;
-    }
-
-    .connect-btn button {
-      padding: 12px 20px;
-      background: #9b59b6;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 14px;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-
-    .connect-btn button:hover { background: #8e44ad; }
-
-    .switch-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
       gap: 20px;
     }
 
-    .switch-label {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: #f0f4f8;
-      padding: 10px 15px;
-      border-radius: 10px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-
-    .switch {
-      position: relative;
-      display: inline-block;
-      width: 50px;
-      height: 28px;
-    }
-
-    .switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-
-    .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: #ccc;
-      transition: .4s;
-      border-radius: 34px;
-    }
-
-    .slider:before {
-      position: absolute;
-      content: "";
-      height: 20px;
-      width: 20px;
-      left: 4px;
-      bottom: 4px;
-      background-color: white;
-      transition: .4s;
-      border-radius: 50%;
-    }
-
-    input:checked + .slider { background-color: #27ae60; }
-    input:checked + .slider:before { transform: translateX(22px); }
-
-    .floating-add-btn {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: #27ae60;
-      color: white;
+    button {
+      background: #ffffff;
       border: none;
-      border-radius: 50%;
-      width: 60px;
-      height: 60px;
-      font-size: 30px;
+      padding: 15px 30px;
+      border-radius: 50px;
+      font-size: 1rem;
+      font-weight: bold;
+      color: #333;
       cursor: pointer;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: 0.3s;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     }
 
-    .floating-add-btn:hover {
-      background: #2ecc71;
-    }
-
-    @media (max-width: 768px) {
-      body { flex-direction: column; }
-      .sidebar { width: 100%; height: auto; }
-      .container { flex-direction: column; margin-left: 0 !important; }
-      .toggle-menu { left: 10px; }
+    button:hover {
+      background: #333;
+      color: #ffffff;
+      transform: scale(1.05);
     }
   </style>
 </head>
 <body>
-  <button class="toggle-menu" onclick="toggleSidebar()">☰ Menu</button>
 
-  <div class="sidebar" id="sidebar">
-    <h2>Commands</h2>
-    <label>Forward</label><input id="cmdF" value="+F">
-    <label>Backward</label><input id="cmdB" value="+B">
-    <label>Left</label><input id="cmdL" value="+L">
-    <label>Right</label><input id="cmdR" value="+R">
-    <label>Stop</label><input id="cmdS" value="+S">
-    <hr>
-    <h2>Slide Commands</h2>
-    <div id="slideInputs"></div>
+  <h1>Which connection do you have?</h1>
+
+  <div class="buttons">
+    <button onclick="location.href='bluetoothmanual.html'">Bluetooth</button>
+    <button onclick="location.href='serialmanual.html'">Serial Port</button>
   </div>
 
-  <div class="container" id="container">
-    <div class="left-panel">
-      <h2>EDUINO ROBOT CONTROLLER</h2>
-      <div class="direction-pad">
-        <div></div>
-        <button onclick="sendCustomCommand('F')">⬆️</button>
-        <div></div>
-        <button onclick="sendCustomCommand('L')">⬅️</button>
-        <button onclick="sendCustomCommand('S')">⏹</button>
-        <button onclick="sendCustomCommand('R')">➡️</button>
-        <div></div>
-        <button onclick="sendCustomCommand('B')">⬇️</button>
-        <div></div>
-      </div>
-      <div class="connect-btn">
-        <button onclick="connectBluetooth()">🔗 Connect</button>
-        <button onclick="startVoiceRecognition()">🎤 Voice</button>
-        <button onclick="window.location.href='tm.html'">🤖 AI Mode</button>
-      </div>
-    </div>
-
-    <div class="right-panel">
-      <h2>SLIDE SWITCHES</h2>
-      <div class="switch-grid" id="switchGrid"></div>
-    </div>
-  </div>
-
-  <!-- Floating Add Button -->
-  <button class="floating-add-btn" onclick="addSlideSwitch()">+</button>
-
-  <script>
-    let bluetoothDevice;
-    let writeCharacteristic;
-    let slideCount = 0;
-
-    async function connectBluetooth() {
-      try {
-        bluetoothDevice = await navigator.bluetooth.requestDevice({
-          acceptAllDevices: true,
-          optionalServices: ['0000ffe0-0000-1000-8000-00805f9b34fb']
-        });
-        const server = await bluetoothDevice.gatt.connect();
-        const service = await server.getPrimaryService('0000ffe0-0000-1000-8000-00805f9b34fb');
-        const characteristics = await service.getCharacteristics();
-        writeCharacteristic = characteristics.find(c => c.properties.write || c.properties.writeWithoutResponse);
-        if (!writeCharacteristic) return alert("❌ Write characteristic not found!");
-        alert("✅ Bluetooth Connected!");
-      } catch (err) {
-        alert("❌ Connection Failed: " + err);
-      }
-    }
-
-    async function sendCommand(command) {
-      if (!writeCharacteristic) return alert("Please connect Bluetooth first.");
-      const data = new TextEncoder().encode(command);
-      try {
-        await writeCharacteristic.writeValue(data);
-        console.log(`📤 Sent: ${command}`);
-      } catch (error) {
-        alert("❌ Write failed: " + error);
-      }
-    }
-
-    function sendCustomCommand(type) {
-      const cmd = document.getElementById('cmd' + type).value || `+${type}`;
-      sendCommand(cmd);
-    }
-
-    function addSlideSwitch() {
-      slideCount++;
-      const slideInputsDiv = document.getElementById("slideInputs");
-      const switchGrid = document.getElementById("switchGrid");
-
-      // Add inputs to the sidebar
-      slideInputsDiv.innerHTML += `
-        <label>Slide ${slideCount} ON</label><input id="slideOn${slideCount}" value="ON${slideCount}">
-        <label>Slide ${slideCount} OFF</label><input id="slideOff${slideCount}" value="OFF${slideCount}">
-      `;
-
-      // Add switch to the main grid
-      const div = document.createElement("div");
-      div.className = "switch-label";
-      div.innerHTML = `
-        <span>Slide ${slideCount}</span>
-        <label class="switch">
-          <input type="checkbox" onchange="handleSlide(${slideCount}, this.checked)">
-          <span class="slider"></span>
-        </label>
-      `;
-      switchGrid.appendChild(div);
-    }
-
-    function handleSlide(index, checked) {
-      const onCmd = document.getElementById(`slideOn${index}`).value;
-      const offCmd = document.getElementById(`slideOff${index}`).value;
-      sendCommand(checked ? onCmd : offCmd);
-    }
-
-    function toggleSidebar() {
-      document.getElementById("sidebar").classList.toggle("hidden");
-      document.getElementById("container").classList.toggle("shifted");
-    }
-  </script>
 </body>
 </html>
